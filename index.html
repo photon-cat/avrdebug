@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AVR Debugger</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <!-- Toolbar -->
+  <div id="toolbar">
+    <div class="toolbar-group">
+      <select id="example-select" title="Load example sketch">
+        <option value="">Examples...</option>
+        <option value="blink">Blink</option>
+        <option value="serial_hello">Serial Hello</option>
+        <option value="counter">Counter</option>
+        <option value="fibonacci">Fibonacci</option>
+      </select>
+      <button id="btn-load" title="Load HEX file">Load HEX</button>
+      <button id="btn-assemble" title="Assemble source code">Assemble</button>
+      <div class="toolbar-sep"></div>
+      <button id="btn-run" title="Run (F5)" class="accent">Run</button>
+      <button id="btn-pause" title="Pause (F6)">Pause</button>
+      <button id="btn-step" title="Step (F10)">Step</button>
+      <button id="btn-step-over" title="Step Over (F11)">Step Over</button>
+      <button id="btn-reset" title="Reset">Reset</button>
+    </div>
+    <div class="toolbar-group">
+      <label class="speed-label">Speed:
+        <input type="range" id="speed-slider" min="1" max="5" value="3" step="1">
+      </label>
+      <span id="status-badge" class="badge stopped">Stopped</span>
+      <span id="cycles-display" class="mono">Cycles: 0</span>
+    </div>
+    <input type="file" id="file-input" accept=".hex,.ihex" style="display:none">
+  </div>
+
+  <!-- Main Layout -->
+  <div id="main">
+    <!-- Left column: Disassembly + Assembly editor -->
+    <div id="left-col">
+      <div id="disasm-panel" class="panel">
+        <div class="panel-header">Disassembly</div>
+        <div id="disasm-container"></div>
+      </div>
+      <div id="asm-panel" class="panel">
+        <div class="panel-header">
+          Assembly Source
+          <button id="btn-asm-inline" class="small-btn">Assemble</button>
+        </div>
+        <textarea id="asm-editor" spellcheck="false" placeholder="; Enter AVR assembly here
+; Example:
+LDI r16, 0xFF
+OUT 0x04, r16    ; DDRB = 0xFF
+loop:
+  SBI 0x05, 5    ; PORTB |= (1<<5)
+  LDI r24, 100
+delay:
+  DEC r24
+  BRNE delay
+  CBI 0x05, 5
+  LDI r24, 100
+delay2:
+  DEC r24
+  BRNE delay2
+  RJMP loop"></textarea>
+        <div id="asm-errors" class="error-display"></div>
+      </div>
+    </div>
+
+    <!-- Right column: Registers + Memory -->
+    <div id="right-col">
+      <div id="regs-panel" class="panel">
+        <div class="panel-header">CPU State</div>
+        <div id="cpu-state">
+          <div id="pc-sp-row">
+            <span class="state-item">PC: <span id="val-pc" class="mono val">0x0000</span></span>
+            <span class="state-item">SP: <span id="val-sp" class="mono val">0x08FF</span></span>
+            <span class="state-item">Cycles: <span id="val-cycles" class="mono val">0</span></span>
+          </div>
+          <div id="sreg-row">
+            <span class="sreg-label">SREG:</span>
+            <span class="sreg-bit" data-bit="7" title="Global Interrupt Enable">I</span>
+            <span class="sreg-bit" data-bit="6" title="Bit Copy Storage">T</span>
+            <span class="sreg-bit" data-bit="5" title="Half Carry Flag">H</span>
+            <span class="sreg-bit" data-bit="4" title="Sign Bit">S</span>
+            <span class="sreg-bit" data-bit="3" title="Overflow Flag">V</span>
+            <span class="sreg-bit" data-bit="2" title="Negative Flag">N</span>
+            <span class="sreg-bit" data-bit="1" title="Zero Flag">Z</span>
+            <span class="sreg-bit" data-bit="0" title="Carry Flag">C</span>
+          </div>
+          <div id="registers-grid"></div>
+        </div>
+      </div>
+      <div id="mem-panel" class="panel">
+        <div class="panel-header">
+          Memory
+          <div class="mem-controls">
+            <label>Addr: <input type="text" id="mem-addr-input" class="mono" value="0x0000" size="6"></label>
+            <select id="mem-region">
+              <option value="data">SRAM</option>
+              <option value="prog">Flash</option>
+            </select>
+          </div>
+        </div>
+        <div id="mem-container"></div>
+      </div>
+      <div id="serial-panel" class="panel">
+        <div class="panel-header">
+          Serial Output
+          <button id="btn-clear-serial" class="small-btn">Clear</button>
+        </div>
+        <pre id="serial-output"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

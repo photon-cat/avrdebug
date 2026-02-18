@@ -1,0 +1,454 @@
+/* AVR Debugger - Dark Theme */
+:root {
+  --bg-primary: #1e1e2e;
+  --bg-secondary: #181825;
+  --bg-surface: #313244;
+  --bg-highlight: #45475a;
+  --bg-active: #585b70;
+  --text-primary: #cdd6f4;
+  --text-secondary: #a6adc8;
+  --text-muted: #6c7086;
+  --accent: #89b4fa;
+  --accent-dim: #364468;
+  --green: #a6e3a1;
+  --red: #f38ba8;
+  --yellow: #f9e2af;
+  --peach: #fab387;
+  --mauve: #cba6f7;
+  --teal: #94e2d5;
+  --border: #45475a;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', Consolas, monospace;
+  --font-size: 13px;
+  --radius: 6px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: var(--font-size);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mono { font-family: var(--font-mono); }
+
+/* Toolbar */
+#toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+button {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 5px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+button:hover { background: var(--bg-highlight); }
+button:active { background: var(--bg-active); }
+button.accent { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+button.accent:hover { background: var(--accent); color: var(--bg-primary); }
+
+#example-select {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 5px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+#example-select:hover { background: var(--bg-highlight); }
+
+.small-btn {
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.badge {
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.badge.stopped { background: var(--bg-surface); color: var(--text-muted); }
+.badge.paused { background: #3b3533; color: var(--yellow); }
+.badge.running { background: #2a3b2a; color: var(--green); }
+
+#cycles-display {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.speed-label {
+  color: var(--text-secondary);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+input[type="range"] {
+  width: 80px;
+  accent-color: var(--accent);
+}
+
+/* Main Layout */
+#main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex: 1;
+  min-height: 0;
+  gap: 0;
+}
+
+#left-col, #right-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+#left-col {
+  border-right: 1px solid var(--border);
+}
+
+/* Panels */
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 10px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+/* Disassembly */
+#disasm-panel { flex: 1; }
+#disasm-container {
+  flex: 1;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.disasm-line {
+  display: flex;
+  padding: 0 8px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  min-height: 22px;
+  align-items: center;
+}
+
+.disasm-line:hover { background: var(--bg-surface); }
+.disasm-line.current {
+  background: var(--accent-dim);
+  border-left-color: var(--accent);
+}
+.disasm-line.breakpoint .disasm-bp::after {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--red);
+  border-radius: 50%;
+}
+
+.disasm-bp {
+  width: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.disasm-addr {
+  width: 58px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.disasm-bytes {
+  width: 90px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.disasm-mnemonic {
+  width: 60px;
+  color: var(--accent);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.disasm-operands {
+  color: var(--text-primary);
+  flex: 1;
+}
+
+/* Assembly Editor */
+#asm-panel { flex: 0 0 200px; }
+#asm-editor {
+  flex: 1;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: none;
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+  tab-size: 4;
+}
+
+.error-display {
+  color: var(--red);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 0 10px;
+  background: var(--bg-secondary);
+  max-height: 60px;
+  overflow-y: auto;
+}
+
+.error-display:empty { display: none; }
+
+/* Registers */
+#regs-panel { flex: 0 0 auto; }
+#cpu-state { padding: 8px 10px; }
+
+#pc-sp-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 6px;
+}
+
+.state-item {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.val { color: var(--text-primary); font-weight: 600; }
+.val.changed { color: var(--yellow); }
+
+#sreg-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.sreg-label {
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin-right: 4px;
+}
+
+.sreg-bit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 3px;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  cursor: default;
+  transition: all 0.15s;
+}
+
+.sreg-bit.set {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.sreg-bit.changed {
+  outline: 2px solid var(--yellow);
+}
+
+#registers-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.reg-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px 0;
+  border-radius: 3px;
+  background: var(--bg-surface);
+}
+
+.reg-cell .reg-name {
+  color: var(--text-muted);
+  font-size: 9px;
+}
+
+.reg-cell .reg-val {
+  color: var(--text-primary);
+}
+
+.reg-cell.changed .reg-val {
+  color: var(--yellow);
+  font-weight: 700;
+}
+
+.reg-cell.special .reg-name {
+  color: var(--mauve);
+}
+
+/* Memory View */
+#mem-panel { flex: 1; }
+
+.mem-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.mem-controls input {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  outline: none;
+}
+
+.mem-controls select {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 11px;
+  outline: none;
+}
+
+#mem-container {
+  flex: 1;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 4px 8px;
+}
+
+.mem-row {
+  display: flex;
+  white-space: nowrap;
+}
+
+.mem-addr {
+  color: var(--text-muted);
+  margin-right: 10px;
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.mem-hex {
+  margin-right: 12px;
+}
+
+.mem-byte {
+  display: inline-block;
+  width: 22px;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.mem-byte.zero { color: var(--text-muted); }
+.mem-byte.changed { color: var(--yellow); font-weight: 700; }
+
+.mem-ascii {
+  color: var(--teal);
+}
+
+.mem-ascii-char.zero { color: var(--text-muted); }
+
+/* Serial Output */
+#serial-panel { flex: 0 0 120px; }
+#serial-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--green);
+  background: var(--bg-primary);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--bg-highlight); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--bg-active); }
+
+/* Focus styles */
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
